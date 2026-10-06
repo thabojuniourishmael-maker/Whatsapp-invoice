@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Invoice</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 25px 20px;
+      border-radius: 18px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .item {
+      border: 1px solid #e5e7eb;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .primary {
+      background: #111827;
+      color: white;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px solid #eee;
+    }
+
+    .invoice-preview {
+      display: none;
+    }
+
+    .invoice-box {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .invoice-number {
+      color: #666;
+      font-size: 13px;
+    }
+
+    .invoice-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .invoice-total {
+      text-align: right;
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .success {
+      background: #ecfdf5;
+      color: #065f46;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <h1>WhatsApp Invoice</h1>
+    <p>Create professional invoices in seconds.</p>
+  </header>
+
+  <div class="card">
+
+    <h2>Business Details</h2>
+
+    <label>Business Name</label>
+    <input id="businessName" placeholder="e.g. Junior's Cakes">
+
+    <label>Business Phone</label>
+    <input id="businessPhone" placeholder="e.g. 71 234 567">
+
+  </div>
+
+  <div class="card">
+
+    <h2>Customer</h2>
+
+    <label>Customer Name</label>
+    <input id="customerName" placeholder="Customer name">
+
+    <label>WhatsApp Number</label>
+    <input id="customerPhone" placeholder="e.g. 26771234567">
+
+  </div>
+
+  <div class="card">
+
+    <h2>Invoice Item</h2>
+
+    <div class="item">
+
+      <label>Description</label>
+      <input id="itemDescription" placeholder="e.g. Birthday Cake">
+
+      <label>Quantity</label>
+      <input id="quantity" type="number" value="1">
+
+      <label>Price (P)</label>
+      <input id="price" type="number" placeholder="0.00">
+
+    </div>
+
+    <div class="total">
+      <span>Total</span>
+      <span id="total">P0.00</span>
+    </div>
+
+    <button class="primary" onclick="generateInvoice()">
+      Generate Invoice
+    </button>
+
+  </div>
+
+  <div class="card invoice-preview" id="preview">
+
+    <h2>Invoice Preview</h2>
+
+    <div class="invoice-box">
+
+      <div class="invoice-header">
+
+        <div>
+          <strong id="previewBusiness"></strong>
+          <br>
+          <span id="previewPhone"></span>
+        </div>
+
+        <div>
+          <strong>INVOICE</strong>
+          <br>
+          <span class="invoice-number" id="invoiceNumber"></span>
+        </div>
+
+      </div>
+
+      <p>
+        <strong>Bill To:</strong>
+        <br>
+        <span id="previewCustomer"></span>
+      </p>
+
+      <br>
+
+      <div class="invoice-row">
+        <span id="previewItem"></span>
+        <span id="previewAmount"></span>
+      </div>
+
+      <div class="invoice-total">
+        Total: <span id="previewTotal"></span>
+      </div>
+
+    </div>
+
+    <button class="primary" onclick="sendWhatsApp()">
+      Send via WhatsApp
+    </button>
+
+    <div class="success" id="successMessage">
+      WhatsApp is opening...
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+function calculateTotal() {
+
+  const quantity =
+    Number(document.getElementById("quantity").value) || 0;
+
+  const price =
+    Number(document.getElementById("price").value) || 0;
+
+  const total = quantity * price;
+
+  document.getElementById("total").textContent =
+    "P" + total.toFixed(2);
+
+  return total;
+}
+
+document.getElementById("quantity")
+  .addEventListener("input", calculateTotal);
+
+document.getElementById("price")
+  .addEventListener("input", calculateTotal);
+
+
+function generateInvoice() {
+
+  const business =
+    document.getElementById("businessName").value;
+
+  const phone =
+    document.getElementById("businessPhone").value;
+
+  const customer =
+    document.getElementById("customerName").value;
+
+  const item =
+    document.getElementById("itemDescription").value;
+
+  const quantity =
+    Number(document.getElementById("quantity").value) || 0;
+
+  const price =
+    Number(document.getElementById("price").value) || 0;
+
+  const total = quantity * price;
+
+  if (!business || !customer || !item || !price) {
+    alert("Please complete the invoice details.");
+    return;
+  }
+
+  document.getElementById("previewBusiness").textContent =
+    business;
+
+  document.getElementById("previewPhone").textContent =
+    phone;
+
+  document.getElementById("previewCustomer").textContent =
+    customer;
+
+  document.getElementById("previewItem").textContent =
+    item + " × " + quantity;
+
+  document.getElementById("previewAmount").textContent =
+    "P" + total.toFixed(2);
+
+  document.getElementById("previewTotal").textContent =
+    "P" + total.toFixed(2);
+
+  document.getElementById("invoiceNumber").textContent =
+    "INV-" + Date.now().toString().slice(-6);
+
+  document.getElementById("preview").style.display =
+    "block";
+
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+}
+
+
+function sendWhatsApp() {
+
+  const customer =
+    document.getElementById("customerName").value;
+
+  const phone =
+    document.getElementById("customerPhone").value;
+
+  const business =
+    document.getElementById("businessName").value;
+
+  const total =
+    document.getElementById("previewTotal").textContent;
+
+  const invoice =
+    document.getElementById("invoiceNumber").textContent;
+
+  const message =
+`Hello ${customer},
+
+Please find your invoice ${invoice} from ${business}.
+
+Amount due: ${total}
+
+Thank you for your business.`;
+
+  const url =
+    "https://wa.me/" +
+    phone.replace(/\D/g, "") +
+    "?text=" +
+    encodeURIComponent(message);
+
+  document.getElementById("successMessage").style.display =
+    "block";
+
+  window.open(url, "_blank");
+}
+
+</script>
+
+</body>
+</html>
